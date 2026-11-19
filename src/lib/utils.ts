@@ -44,6 +44,7 @@ export function getGoogleMapsUrl(lat: number | null | undefined, lng: number | n
 }
 
 export function getHdopQuality(hdop: number): { label: string; color: string } {
+  if (hdop <= 0 || hdop >= 50.0) return { label: "No Fix", color: "text-amber-500" };
   if (hdop <= 1.0) return { label: "Ideal", color: "text-emerald-500" };
   if (hdop <= 2.0) return { label: "Excellent", color: "text-emerald-400" };
   if (hdop <= 5.0) return { label: "Moderate", color: "text-amber-500" };

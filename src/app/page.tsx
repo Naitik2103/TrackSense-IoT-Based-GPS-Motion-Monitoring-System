@@ -68,29 +68,29 @@ export default function SmartTrackDashboard() {
             <Radio className="w-4 h-4 shrink-0 text-sky-500" />
             <span>
               <strong>Demo Mode (Sample Data):</strong> Showing simulated campus tracker movement. Switch to{" "}
-              <strong>Live</strong> mode to receive actual telemetry from your ESP32 hardware.
+              <strong>Live</strong> mode to receive actual telemetry from your ESP32 hardware via Firebase.
             </span>
           </div>
         ) : !isConnected ? (
           <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs font-mono">
             <WifiOff className="w-4 h-4 shrink-0 text-amber-500" />
             <span>
-              <strong>Waiting for ESP32 Connection:</strong> Hardware has not published telemetry yet. Power on your
-              ESP32 to stream live GPS &amp; MPU6050 packets to topic <code>tracker/location</code>.
+              <strong>Waiting for ESP32 Connection:</strong> Awaiting live packets from Firebase Realtime Database at{" "}
+              <code>/devices/TRACKER01</code>. Power on your ESP32 to stream live sensor telemetry.
             </span>
           </div>
         ) : !hasGpsCoords ? (
           <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 text-sky-800 dark:text-sky-300 text-xs font-mono">
             <AlertCircle className="w-4 h-4 shrink-0 text-sky-500" />
             <span>
-              <strong>ESP32 Connected:</strong> Receiving MPU6050 sensor data. Awaiting 3D satellite lock from NEO-6M GPS receiver...
+              <strong>ESP32 Connected (Firebase RTDB):</strong> Receiving MPU6050 motion sensor telemetry. GPS is searching for satellites (indoor testing).
             </span>
           </div>
         ) : (
           <div className="flex items-center gap-2.5 px-4 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 text-xs font-mono">
             <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
             <span>
-              <strong>Live Telemetry Stream Active:</strong> ESP32 connected &amp; valid GPS lock acquired.
+              <strong>Live Telemetry Stream Active:</strong> ESP32 connected to Firebase Realtime Database &amp; valid GPS fix acquired.
             </span>
           </div>
         )}

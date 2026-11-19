@@ -17,6 +17,7 @@
     "autoprefixer": "^10.6.2",
     "clsx": "^2.1.1",
     "debug": "^4.4.3",
+    "firebase": "^13.4.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.75.0",
     "mqtt": "^5.16.1",

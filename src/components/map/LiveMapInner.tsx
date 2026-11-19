@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import { TrackerData } from "@/types/tracker";
-import { ExternalLink, LocateFixed, ZoomIn, ZoomOut } from "lucide-react";
+import { ExternalLink, LocateFixed, ZoomIn, ZoomOut, Satellite } from "lucide-react";
 import { formatCoordinate, getGoogleMapsUrl } from "@/lib/utils";
 
 interface LiveMapInnerProps {
@@ -20,7 +20,12 @@ export default function LiveMapInner({ data, isDark = true }: LiveMapInnerProps)
 
   const [autoCenter, setAutoCenter] = useState<boolean>(true);
 
-  const hasCoords = data.latitude !== null && data.longitude !== null;
+  const hasCoords =
+    data.latitude !== null &&
+    data.longitude !== null &&
+    !isNaN(data.latitude) &&
+    !isNaN(data.longitude);
+
   const currentLat = data.latitude ?? 23.187574;
   const currentLng = data.longitude ?? 72.626864;
 
@@ -45,12 +50,12 @@ export default function LiveMapInner({ data, isDark = true }: LiveMapInnerProps)
         '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors',
     }).addTo(map);
 
-    // Marker
+    // Marker - only visible when coordinates are valid
     const markerIcon = createTrackerMarkerIcon(data);
     const marker = L.marker([currentLat, currentLng], {
       icon: markerIcon,
       zIndexOffset: 1000,
-      opacity: hasCoords ? 1 : 0.6,
+      opacity: hasCoords ? 1 : 0, // Hidden when no fix
     }).addTo(map);
 
     marker.bindPopup(createPopupContent(data));
@@ -82,8 +87,8 @@ export default function LiveMapInner({ data, isDark = true }: LiveMapInnerProps)
     const map = mapInstanceRef.current;
 
     if (!hasCoords) {
-      markerRef.current.setOpacity(0.4);
-      markerRef.current.setPopupContent(createPopupContent(data));
+      // Hide marker and accuracy circle when no valid coordinates
+      markerRef.current.setOpacity(0);
       if (accuracyCircleRef.current) {
         accuracyCircleRef.current.setRadius(0);
       }
@@ -92,7 +97,7 @@ export default function LiveMapInner({ data, isDark = true }: LiveMapInnerProps)
 
     const latLng: [number, number] = [data.latitude!, data.longitude!];
 
-    // Update marker position & icon
+    // Update marker position, icon & popup
     markerRef.current.setOpacity(1.0);
     markerRef.current.setLatLng(latLng);
     markerRef.current.setIcon(createTrackerMarkerIcon(data));
@@ -116,7 +121,7 @@ export default function LiveMapInner({ data, isDark = true }: LiveMapInnerProps)
     } else if (autoCenter) {
       map.panTo(latLng, { animate: true, duration: 0.6 });
     }
-  }, [data.latitude, data.longitude, data.movement, data.deviceStatus, data.gpsStatus, autoCenter]);
+  }, [data.latitude, data.longitude, data.movement, data.deviceStatus, data.gpsStatus, autoCenter, hasCoords]);
 
   // Recenter handler
   const handleRecenter = () => {
@@ -166,12 +171,19 @@ export default function LiveMapInner({ data, isDark = true }: LiveMapInnerProps)
         </button>
       </div>
 
-      {/* Floating Waiting State Banner (When in Live Mode without coordinates) */}
+      {/* Centered Informative Searching Message (When indoors / null coordinates) */}
       {!hasCoords && (
-        <div className="absolute top-4 left-4 z-10 pointer-events-none">
-          <div className="px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 backdrop-blur-md text-amber-700 dark:text-amber-300 text-xs font-mono font-medium shadow flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-            <span>Waiting for GPS fix from NEO-6M...</span>
+        <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center p-4">
+          <div className="max-w-sm bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-lg text-center space-y-2 pointer-events-auto">
+            <div className="inline-flex p-2.5 rounded-full bg-amber-500/10 text-amber-500">
+              <Satellite className="w-5 h-5 animate-pulse" />
+            </div>
+            <div className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
+              GPS Searching (Indoor Testing)
+            </div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              NEO-6M receiver is searching for satellites. Marker will appear on the map automatically once 3D GPS fix is acquired.
+            </div>
           </div>
         </div>
       )}

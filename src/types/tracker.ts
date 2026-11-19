@@ -14,6 +14,28 @@ export interface GyroscopeData {
   z: number;
 }
 
+export interface FirebaseDevicePayload {
+  device_id?: string;
+  deviceId?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  altitude?: number | null;
+  satellites?: number;
+  hdop?: number;
+  gps_status?: string;
+  gpsStatus?: string;
+  movement?: boolean;
+  acceleration?: {
+    x?: number;
+    y?: number;
+    z?: number;
+  };
+  battery_percentage?: number | null;
+  battery_voltage?: number | null;
+  wifi_rssi?: number | null;
+  timestamp?: number | string;
+}
+
 /**
  * Standard Central Tracker Data Model (Step 1)
  */
